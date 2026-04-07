@@ -9,6 +9,7 @@ import ExplanationCard from '@/components/study/ExplanationCard';
 import QuizCard from '@/components/study/QuizCard';
 import PYQCard from '@/components/study/PYQCard';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, BrainCircuit, GraduationCap, Sparkles, Loader2, History, BookOpen } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
