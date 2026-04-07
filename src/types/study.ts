@@ -6,6 +6,18 @@ export interface TopicExplanation {
   keyPoints: string[];
   analogy?: string;
   formulas?: string[];
+  derivations?: string[];
+  shortcuts?: string[];
+}
+
+export interface PYQ {
+  id: string;
+  year: number;
+  exam: 'JEE Main' | 'JEE Advanced';
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  stepByStepSolution: string[];
 }
 
 export interface Question {

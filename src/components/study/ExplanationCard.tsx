@@ -4,7 +4,7 @@ import React from 'react';
 import { TopicExplanation } from '@/types/study';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Lightbulb, BookOpen, Zap, Volume2 } from 'lucide-react';
+import { Lightbulb, BookOpen, Zap, Volume2, FileText, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Props {
@@ -43,34 +43,70 @@ const ExplanationCard = ({ explanation, onSpeak }: Props) => {
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <h3 className="font-bold flex items-center gap-2">
-              <Zap className="w-4 h-4 text-primary" />
-              Key Takeaways
-            </h3>
-            <ul className="space-y-2">
-              {explanation.keyPoints.map((point, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                  {point}
-                </li>
-              ))}
-            </ul>
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="font-bold flex items-center gap-2 text-primary">
+                <Zap className="w-4 h-4" />
+                Key Takeaways
+              </h3>
+              <ul className="space-y-2">
+                {explanation.keyPoints.map((point, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {explanation.shortcuts && explanation.shortcuts.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="font-bold flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                  <Rocket className="w-4 h-4" />
+                  Shortcuts & Tricks
+                </h3>
+                <div className="space-y-2">
+                  {explanation.shortcuts.map((trick, i) => (
+                    <div key={i} className="p-3 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl border border-emerald-100 dark:border-emerald-900/50 text-sm">
+                      {trick}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {explanation.formulas && explanation.formulas.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="font-bold">Essential Formulas</h3>
-              <div className="flex flex-wrap gap-2">
-                {explanation.formulas.map((formula, i) => (
-                  <Badge key={i} variant="secondary" className="font-mono text-sm py-1 px-3">
-                    {formula}
-                  </Badge>
-                ))}
+          <div className="space-y-6">
+            {explanation.formulas && explanation.formulas.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="font-bold">Essential Formulas</h3>
+                <div className="flex flex-wrap gap-2">
+                  {explanation.formulas.map((formula, i) => (
+                    <Badge key={i} variant="secondary" className="font-mono text-sm py-1 px-3">
+                      {formula}
+                    </Badge>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {explanation.derivations && explanation.derivations.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="font-bold flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                  <FileText className="w-4 h-4" />
+                  Derivations
+                </h3>
+                <div className="space-y-3">
+                  {explanation.derivations.map((derivation, i) => (
+                    <div key={i} className="p-4 bg-indigo-50 dark:bg-indigo-950/20 rounded-xl border border-indigo-100 dark:border-indigo-900/50 text-sm font-mono leading-relaxed">
+                      {derivation}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </Card>
     </div>

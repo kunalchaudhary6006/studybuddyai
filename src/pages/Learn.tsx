@@ -2,13 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { DifficultyLevel, TopicExplanation, Question } from '@/types/study';
-import { getExplanation, generateQuiz } from '@/services/mockAi';
+import { DifficultyLevel, TopicExplanation, Question, PYQ } from '@/types/study';
+import { getExplanation, generateQuiz, getPYQs } from '@/services/mockAi';
 import LevelSelector from '@/components/study/LevelSelector';
 import ExplanationCard from '@/components/study/ExplanationCard';
 import QuizCard from '@/components/study/QuizCard';
+import PYQCard from '@/components/study/PYQCard';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, BrainCircuit, GraduationCap, Sparkles, Loader2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronLeft, BrainCircuit, GraduationCap, Sparkles, Loader2, History, BookOpen } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
 
 const Learn = () => {
@@ -18,6 +20,7 @@ const Learn = () => {
   
   const [level, setLevel] = useState<DifficultyLevel>('Beginner');
   const [explanation, setExplanation] = useState<TopicExplanation | null>(null);
+  const [pyqs, setPyqs] = useState<PYQ[]>([]);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<'learn' | 'quiz'>('learn');
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -25,8 +28,12 @@ const Learn = () => {
   useEffect(() => {
     const loadContent = async () => {
       setLoading(true);
-      const data = await getExplanation(topic, level);
-      setExplanation(data);
+      const [expData, pyqData] = await Promise.all([
+        getExplanation(topic, level),
+        getPYQs(topic)
+      ]);
+      setExplanation(expData);
+      setPyqs(pyqData);
       setLoading(false);
     };
     loadContent();
@@ -62,7 +69,7 @@ const Learn = () => {
             <BrainCircuit className="w-6 h-6 text-primary" />
             <h1 className="font-bold text-lg truncate max-w-[200px]">{topic}</h1>
           </div>
-          <div className="w-20" /> {/* Spacer */}
+          <div className="w-20" />
         </div>
       </nav>
 
@@ -78,23 +85,54 @@ const Learn = () => {
               <LevelSelector current={level} onChange={setLevel} />
             </div>
 
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                <p className="text-muted-foreground font-medium">AI is synthesizing your lesson...</p>
-              </div>
-            ) : explanation && (
-              <div className="space-y-8">
-                <ExplanationCard explanation={explanation} onSpeak={handleSpeak} />
-                
-                <div className="flex justify-center pt-8">
-                  <Button size="lg" onClick={startQuiz} className="h-16 px-10 rounded-2xl text-lg font-bold gap-3 shadow-xl hover:scale-105 transition-transform">
-                    <GraduationCap className="w-6 h-6" />
-                    Test Your Knowledge
-                  </Button>
-                </div>
-              </div>
-            )}
+            <Tabs defaultValue="concept" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-8 h-12 p-1 bg-muted rounded-xl">
+                <TabsTrigger value="concept" className="rounded-lg gap-2">
+                  <BookOpen className="w-4 h-4" /> Concept
+                </TabsTrigger>
+                <TabsTrigger value="pyqs" className="rounded-lg gap-2">
+                  <History className="w-4 h-4" /> Previous Year Questions
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="concept">
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                    <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                    <p className="text-muted-foreground font-medium">AI is synthesizing your lesson...</p>
+                  </div>
+                ) : explanation && (
+                  <div className="space-y-8">
+                    <ExplanationCard explanation={explanation} onSpeak={handleSpeak} />
+                    <div className="flex justify-center pt-8">
+                      <Button size="lg" onClick={startQuiz} className="h-16 px-10 rounded-2xl text-lg font-bold gap-3 shadow-xl hover:scale-105 transition-transform">
+                        <GraduationCap className="w-6 h-6" />
+                        Test Your Knowledge
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="pyqs">
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                    <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                    <p className="text-muted-foreground font-medium">Fetching PYQs...</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-bold">Topic-wise PYQs</h3>
+                      <Badge variant="secondary">{pyqs.length} Questions Found</Badge>
+                    </div>
+                    {pyqs.map((pyq) => (
+                      <PYQCard key={pyq.id} pyq={pyq} />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </>
         ) : (
           <div className="pt-8">
